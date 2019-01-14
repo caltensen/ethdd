@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
 	<meta name="format-detection" content="telephone=no" />
 	<meta name="format-detection" content="email=no" />
-	<title>E9</title>
+	<title>EDD</title>
 	<link rel="shortcut icon" href="" />
 	<link href="static/style4eb7e.css" rel="stylesheet" />
 <style>
@@ -204,14 +204,17 @@ table{width:1190px;font-size:15px;line-height:1.2;border-top:0px solid #ff33cc;b
          
          <div role="tabpanel" aria-hidden="true" class="ant-tabs-tabpane ant-tabs-tabpane-inactive" style="border-radius: 20px; min-height: 438px;">
          	<div class="invitation-tab">
-         	<div class="inviter"><span>我的直推数</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="referrer my-recomand-count">--</span></div>
+         	<div class="inviter" style="margin-bottom:15px;"><span>我的直推数 [奖励代数=直推数]</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="referrer my-recomand-count">--</span></div>
          	
-         	<div class="inviter"><span>我的邀请人</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="referrer my-inviter">--</span></div>
+         	<div class="inviter" style="margin-bottom:5px;"><span>我的邀请人</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="referrer my-inviter">--</span></div>
          	<div class="nickname-input-wrapper"><div class="nickname-input-container">
          	<div class="activate-btn my-recomand-link-btn" style="text-align:center;"><span>点击复制我的推荐链接或扫描推荐二维码</span></div></div>
          	
-         	<div class="" style="margin-top:8px;text-align:center;">
-         	<div class="activate-btn my-recomand-link-btn" style="text-align:center;"><span>点击复制我的推荐链接或扫描推荐二维码</span></div></div>
+         	<div class="qrcode" style="margin-top:8px;text-align:center;">
+				<button class="display_qrcode" style="border-radius:20px;height:50px;-webkit-box-shadow:0 0 50px #888;box-shadow:0 0 50px #888;background: #ff33cc;color:white;border:0px;width:150px;margin-top:20px;">展示推荐二维码</button>
+         	<!--<div class="activate-btn my-recomand-link-btn" style="text-align:center;"><span>点击复制我的推荐链接或扫描推荐二维码</span></div></div>-->
+				
+			</div>
          	<!-- <div class="activate-btn my-recomand-link-btn"><span>我的推荐二维码</span></div> -->
          	</div></div>
          </div>
@@ -268,7 +271,7 @@ table{width:1190px;font-size:15px;line-height:1.2;border-top:0px solid #ff33cc;b
            <div class="before-guess">
             
             <table style="width:450px;">
-            	<tr><th rowspan="3" style="width:30%">最后3名玩家</th><td id="b_p1">--</td></tr>
+            	<tr><th rowspan="3" style="width:30%">最后3笔玩家</th><td id="b_p1">--</td></tr>
             	<tr><td id="b_p2">--</td></tr>
             	<tr><td id="b_p3">--</td></tr>
             	
@@ -284,7 +287,7 @@ table{width:1190px;font-size:15px;line-height:1.2;border-top:0px solid #ff33cc;b
             	
             </table>
          	<table style="width:450px;">
-         		<tr><th style="width:30%">最大笔数</th><td id="s_p4"> -- </td></tr>
+         		<tr><th style="width:30%">最大笔数</th><td id="s_p4"> -- </td><td>【每笔必须大于0.5 ETH】</td></tr>
          		
          	</table>
          </div>
@@ -301,6 +304,7 @@ table{width:1190px;font-size:15px;line-height:1.2;border-top:0px solid #ff33cc;b
 <script src="static/lib1.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.36/dist/web3.min.js" integrity="sha256-nWBTbvxhJgjslRyuAKJHK+XcZPlCnmIAAMixz6EefVk=" crossorigin="anonymous"></script>
 <script src="https://cdn.bootcss.com/bignumber.js/8.0.1/bignumber.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
 <script type="text/javascript">
 
 var abi = [
@@ -2017,8 +2021,10 @@ $(document).ready(function(){
 		$($(".operation-right .ant-tabs-tabpane")[index]).removeClass("ant-tabs-tabpane-inactive");
 		$($(".operation-right .ant-tabs-tabpane")[index]).addClass("ant-tabs-tabpane-active");
 	});
-		
+	
 	var iconins;
+	var gnetId = 3;
+	var netCheck = false;
 	var checkNet = function(){
 		
 		if (typeof web3 !== 'undefined') {
@@ -2026,7 +2032,16 @@ $(document).ready(function(){
 		  var icontract = web3.eth.contract(abi);
 	      iconins = icontract.at(gcontract);
 		  web3.version.getNetwork((err, netId) => {
-			  switch (netId) {
+				if(netId != gnetId){
+					if(gnetId == 3)
+						alertify.error("这是一个测试，请使用ropsten测试网!");
+					if(gnetId == 1)
+						alertify.error("请使用正式以太坊主网!");
+				}else{
+					netCheck = true;
+					checkLogin();
+				}
+			  /*switch (netId) {
 			    case "1":
 			    	
 			      checkLogin();
@@ -2042,11 +2057,11 @@ $(document).ready(function(){
 			        break
 			    default:
 			      	console.log('未知的网络.');
-			  }
+			  }*/
 			}); 
 		} else {
 		  console.log('No web3? You should consider trying MetaMask Or TrustWallet!');
-		  
+		  alertify.error("请下载metamask或trustwallet!");
 		  return;
 		  
 		}
@@ -2067,7 +2082,7 @@ $(document).ready(function(){
 		        }
 				
 				if(acc.length==0){
-		          	console.log('please login metamask or trustwallet.');
+		          	//console.log('please login metamask or trustwallet.');
 		          	return;
 		        }
 				if (acc[0] != defaultAccount) {
@@ -2078,14 +2093,15 @@ $(document).ready(function(){
 				  }
 			});
 		}, 1000);
-		
+		//if(!netCheck)
 		web3js.eth.getAccounts(function(err,accounts){
-			if(err != null){
-              	alert('error');
+			if(err){
+				alertify.error(err);
               	return;
           	}
             if(accounts.length==0){
-          	  console.log('please login metamask or trustwallet.');
+          	  //console.log('please login metamask or trustwallet.');
+          	  alertify.error("please login Metamask or trustwallet");
           	  return;
             }
             defaultAccount = accounts[0];
@@ -2098,15 +2114,15 @@ $(document).ready(function(){
 	    		  $(".wallet_address").html(defaultAccount);
 	    		  $(".wallet_amt").html(BN(web3.fromWei(result.toNumber(), 'ether')).toFixed(4,1));
 	    	  });
-	    	  console.log(balance);
+	    	 
 		    }
               
 	   });
 	}
-	
+    
 	var update1 = function(){
 		if(defaultAccount != "" && iconins){
-    	  console.log(defaultAccount);
+    	  
     	  iconins.getPlayerInfoByAddress.call(defaultAccount, call3);
     	  iconins.getRecommander.call({from:defaultAccount}, callq1);
     	  iconins.getRecomCount.call({from:defaultAccount}, callq2);
@@ -2114,7 +2130,7 @@ $(document).ready(function(){
     		  $(".wallet_address").html(defaultAccount);
     		  $(".wallet_amt").html(BN(web3.fromWei(result.toNumber(), 'ether')).toFixed(4,1));
     	  });
-    	  console.log(balance);
+    	
 		}
 	}
 	
@@ -2122,9 +2138,6 @@ $(document).ready(function(){
 		if(iconins){
 			iconins.getCurrentRound24Info.call(call1);
 	 	  	iconins.getCurrentRoundInfo.call(call2);
-	 	  	
-	 	  	//iconins.getTimeLeft.call(callLeftTime);
-	 	  	//iconins.getLeftTime24.call(callLeftTime24);
 		}
 		
 	}
@@ -2201,18 +2214,16 @@ $(document).ready(function(){
 	};
   
      
- 	  iconins.getCurrentRound24Info.call(call1);
- 	  iconins.getCurrentRoundInfo.call(call2);
- 	  
- 	  iconins.getTimeLeft.call(callLeftTime);
- 	  iconins.getLeftTime24.call(callLeftTime24);
+  iconins.getCurrentRound24Info.call(call1);
+  iconins.getCurrentRoundInfo.call(call2);
+  
+  iconins.getTimeLeft.call(callLeftTime);
+  iconins.getLeftTime24.call(callLeftTime24);
   	  
   	var fillSmallpool = function(result){
 		var a = [];
 		a.push(result[0].toNumber());
 		a.push(web3.fromWei(result[3].toNumber(), 'ether'));
-		/* a.push(getDate(result[1].toNumber()));
-		a.push(getDate(result[2].toNumber())); */
 		
 		a.push(result[5].toNumber());
 		a.push(web3.fromWei(result[6].toNumber(), 'ether'));
@@ -2227,21 +2238,12 @@ $(document).ready(function(){
 		$("#s_p3").html(a[5]);
 		
 		$("#s_p4").html(a[2]);
-		/* var remainTime = new BigNumber(result[1].toNumber()).minus(new BigNumber(result[2].toNumber()));
-		console.log("remainTime:" + remainTime); */
-		//refreshSmallTimer(remainTime);
-		/* var obj = $($(".smallpool").find(".row")[0]).find(".cons").each(function(index,element){
-			console.log(a[index]);
-			$($(this).find("div")[1]).html(a[index]);
-		}); */
 	
 	};
 	var fillBgpool = function(result){
 		var a = [];
 		a.push(result[0].toNumber());
 		a.push(web3.fromWei(result[4].toNumber(), 'ether'));
-		/* a.push(getDate(result[2].toNumber()));
-		a.push(getDate(result[3].toNumber())); */
 		
 		a.push(result[5].length > 10 ? result[5].substring(0,10) + "..." : result[5]);
 		a.push(result[6].length > 10 ? result[6].substring(0,10) + "..." : result[6]);
@@ -2252,14 +2254,6 @@ $(document).ready(function(){
 		$("#b_p1").html(a[2]);
 		$("#b_p2").html(a[3]);
 		$("#b_p3").html(a[4]);
-		//var remainTime = new BigNumber(result[2].toNumber()).minus(new BigNumber(result[3].toNumber()));
-		//refreshSmallTimer(remainTime);
-		//console.log("remainTime:" + remainTime);
-		//refreshBigTimer((result[1].toNumber().sub(result[2].toNumber())));
-		/* var obj = $($(".bigpool").find(".row")[0]).find(".cons").each(function(index,element){
-			console.log(a[index]);
-			$($(this).find("div")[1]).html(a[index]);
-		}); */
 	};
 	
 	var fillBank = function(result){
@@ -2267,12 +2261,7 @@ $(document).ready(function(){
 	};
 	
 	var fillmygen = function(result){
-		 /* console.log("你的地址：" + result[0]);
-   		   console.log("key的数量：" + web3.fromWei(result[1].toNumber(), 'ether'));
-   		   console.log("你的奖池以太数：" + web3.fromWei(result[2].toNumber(), 'ether'));
-   		   console.log("你的收益数：" + web3.fromWei(result[3].toNumber()));
-   		   console.log("你一共投的以太数：" + web3.fromWei(result[4].toNumber(), 'ether')); */
-		console.log(result);
+		
 		var a = [];
 		 a.push(result[0]);
 		 //普通gen
@@ -2289,18 +2278,18 @@ $(document).ready(function(){
 		$(".valut_gen").html(BN(a[1]).toFixed(4, 1));
 		$(".valut_win").html(BN(a[2]).toFixed(4, 1));
 		
-		//$(".#valut_gen_win").html(a[]);
-		/* var obj = $($(".mygen").find(".row")[0]).find(".cons").each(function(index,element){
-			console.log(a[index]);
-			$($(this).find("div")[1]).html(a[index]);
-		}); */
+		
 	};
 	
 	$(".s-open-btn").click(function(){
+		if(!netCheck){
+			alertify.error("请选择正确的网络");
+			return;
+		}
 		if(!defaultAccount || defaultAccount == ""){
-			//if(!checkNet)
+			
 			alertify.error("please login Metamask");
-			console.log("please login Metamask");
+			
 			return;
 		}
 		iconins.pool24Open({from: defaultAccount}, function(err, result){
@@ -2308,19 +2297,45 @@ $(document).ready(function(){
 		});
 	});
 	
+	var getRecomander = function() {
+        var reg = new RegExp("(^|&)r=([^&]*)(&|$)"); 
+        var r = window.location.search.substr(1).match(reg); 
+        if (r != null) return unescape(r[2]); 
+        return null; 
+    }
+	
+	var recommander = getRecomander();
+	//console.log("rrr : " + recommander);
 	$(".quick-join").click(function(){
+		if(!netCheck){
+			alertify.error("请选择正确的以太网络！");
+			return;
+		}
 		console.log(defaultAccount);
 		if(!defaultAccount || defaultAccount == ""){
 			//if(!checkNet)
 			alertify.error("please login Metamask");
-			console.log("please login Metamask");
 			return;
 		}
 		var etherValue = web3.toWei(0.1, 'ether');
 		console.log(etherValue);
-		iconins.buyT({from: defaultAccount, value: etherValue}, function(err, result){
-			
-		});
+		if(recommander){
+			console.log("recommander: " + recommander);
+			iconins.buy(recommander, {from: defaultAccount, value: etherValue}, function(err, result){
+				if(err){
+					
+					alertify.error(err);
+				}
+					
+			});
+		}else{
+			iconins.buyT({from: defaultAccount, value: etherValue}, function(err, result){
+				if(err){
+					//console.log(err);
+					alertify.error(err);
+				}
+			});
+		}
 	});
 	
 	$(".ethinput").click(function(){
@@ -2328,27 +2343,43 @@ $(document).ready(function(){
 	});
 	
 	$(".buywitheth").click(function(){
+		if(!netCheck){
+			alertify.error("请选择正确的以太网络！");
+			return;
+		}
 		console.log(defaultAccount);
 		if(!defaultAccount || defaultAccount == ""){
-			//if(!checkNet)
 			alertify.error("please login Metamask");
-			console.log("please login Metamask");
 			return;
 		}
 		var etherValue = web3.toWei($(".ethinput").val(), 'ether');
 		console.log(etherValue);
-		iconins.buyT({from: defaultAccount, value: etherValue}, function(err, result){
-			
-		});
+		if(recommander){
+			console.log("recommander: " + recommander);
+			iconins.buy(recommander, {from: defaultAccount, value: etherValue}, function(err, result){
+				if(err){
+					alertify.error(err);
+				}
+			});
+		}else{
+			iconins.buyT({from: defaultAccount, value: etherValue}, function(err, result){
+				if(err){
+					alertify.error(err);
+				}
+			});
+		}
 	});
 	
 	//复投
 	$(".my-reload-btn").click(function(){
+		if(!netCheck){
+			alertify.error("请选择正确的以太网络！");
+			return;
+		}
 		console.log(defaultAccount);
 		if(!defaultAccount || defaultAccount == ""){
-			//if(!checkNet)
 			alertify.error("please login Metamask");
-			console.log("please login Metamask");
+			
 			return;
 		}
 		var etherValue = web3.toWei($(".valut_gen_win").html(), 'ether');
@@ -2357,31 +2388,106 @@ $(document).ready(function(){
 			return;
 		}
 		//TODO 如果小于0.01，不可复投
-		iconins.reLoad("0x0000000000000000000000000000000000000000",etherValue, function(err, result){
-			
+		var r = "0x0000000000000000000000000000000000000000";
+		r = recommander ? recommander : r;
+		//console.log("r: " + r);
+		iconins.reLoad(r, etherValue, function(err, result){
+			if(err){
+				alertify.error(err);
+			}
 		});
 		
 	});
 	
 	//提现
 	$(".my-withdraw-btn").click(function(){
-		console.log(defaultAccount);
+		if(!netCheck){
+			alertify.error("请选择正确的以太网络！");
+			return;
+		}
+		//console.log(defaultAccount);
 		if(!defaultAccount || defaultAccount == ""){
 			//if(!checkNet)
 			alertify.error("please login Metamask");
-			console.log("please login Metamask");
+			
 			return;
 		}
 		iconins.withdraw(function(err, result){
 			
+			if(err){
+				alertify.error(err);
+			}
 		});
-		/* var etherValue = web3.toWei($(".ethinput").val(), 'ether');
-		console.log(etherValue);
-		iconins.buyT({from: defaultAccount, value: etherValue}, function(err, result){
+	});
+	
+	
+	$(".my-recomand-link-btn").click(function(event){
+		var url = location.href;
+		if(url.indexOf("?") != -1)
+		{
+			url = url.split("?")[0];
 			
-		}); */
+		}
+		var g = $(".wallet_address").html();
+		if(!g || g == ""){
+			alertify.error("please login Metamask");
+			return;
+		}
+		console.log(url + "?r=" + g);
+		
+		function handler(event) {
+			event.clipboardData.setData('text/plain', url + "?r=" + $(".wallet_address").html());
+			document.removeEventListener('copy', handler, true);
+			event.preventDefault();
+			
+			alertify.success("复制成功: " + url + "?r=" + g);
+		}
+		document.addEventListener('copy', handler, true);
+		document.execCommand('copy');
+				
+		/*eee = event;
+		var clipboardData = window.clipboardData; //for IE
+		if (!clipboardData) { // for chrome
+			clipboardData = event.originalEvent.clipboardData;
+		}
+		
+		clipboardData.setData("Text",url + "?r=" + $(".wallet_address").html());
+		alertify.info("复制成功");*/
 	});
+	
+	$(".display_qrcode").click(function(){
+		var url = location.href;
+		if(url.indexOf("?") != -1)
+		{
+			url = url.split("?")[0];
+			
+		}
+		var g = $(".wallet_address").html();
+		if(!g || g == ""){
+			alertify.error("please login Metamask");
+			return;
+		}
+		console.log(url + "?r=" + g);
+		$('.qrcode').html("");
+		$('.qrcode').qrcode({width: 106,height: 106,text: url + "?r=" + g});
 	});
+	/*var url = location.href;
+	if(url.indexOf("?") != -1)
+	{
+		url = url.split("?")[0];
+		
+	}
+	var g = $(".wallet_address").html();
+	if(!g || g == ""){
+		alertify.error("please login Metamask");
+		return;
+	}else{
+		console.log(url + "?r=" + g);
+		$('.qrcode').qrcode({width: 108,height: 108,text: "size doesn't matter"});
+	}*/
+	
+	});
+	
 </script>
  </body>
 </html>
